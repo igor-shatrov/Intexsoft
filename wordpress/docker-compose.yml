@@ -1,23 +1,24 @@
 version: "3.7"
 services:
   web-server:
-    build:
-      dockerfile: php.Dockerfile
-      context: .
+    image: wordpress:5.7.2-apache
     restart: always
+    environment:
+      WORDPRESS_DB_HOST: ${db_host}
+      WORDPRESS_DB_USER: ${db_user}
+      WORDPRESS_DB_PASSWORD: ${db_pass}
+      WORDPRESS_DB_NAME: ${db_name}
     volumes:
-      - "./html/:/var/www/html/"
-    ports:
-      - "8084:80"
+      - wordpress:/var/www/html
 
   db:
     image: mysql:5.7
     restart: always
     environment:
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpress
-      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: ${db_name}
+      MYSQL_USER: ${db_user}
+      MYSQL_PASSWORD: ${db_pass}
+      MYSQL_ROOT_PASSWORD: ${db_root_pass}
     volumes:
       - db:/var/lib/mysql
 
@@ -25,9 +26,9 @@ services:
     image: phpmyadmin/phpmyadmin:5.0.1
     restart: always
     environment:
-      PMA_HOST: db
+      PMA_HOST: ${db_host}
       PMA_USER: root
-      PMA_PASSWORD: secret
+      PMA_PASSWORD: ${db_root_pass}
     ports:
       - "5000:80"
 
@@ -41,3 +42,4 @@ services:
 
 volumes:
   db:
+  wordpress:
